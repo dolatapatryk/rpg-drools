@@ -1,8 +1,54 @@
 package rules
 
+import javax.swing.ButtonGroup;
+import javax.swing.JRadioButton;
+import java.util.ArrayList;
+import java.util.List;
+
+global javax.swing.JFrame frame
+global javax.swing.JTextArea textArea;
+global javax.swing.JPanel optionsContainer;
+
+declare Question
+	text : String
+	selectionMode : int
+	answer : String
+end
+
 
 rule "Init"
     when
     then
+    	Question q = new Question();
+    	q.setText("Which subgenre?");
+    	q.setSelectionMode(1);
+    	q.setAnswer("");
+        insert(q);
+
+end
+
+rule "start"
+    when
+        q : Question(q.getText().equals("Which subgenre?") && q.getAnswer().equals(""));
+    then
+        textArea.append(q.getText() + "\n");
+        List<JRadioButton> buttonList = new ArrayList<>();
+        ButtonGroup group = new ButtonGroup();
+        
+        buttonList.add(new JRadioButton("Humor"));
+        buttonList.add(new JRadioButton("Oriental"));
+        buttonList.add(new JRadioButton("High Fantasy General"));
+        buttonList.add(new JRadioButton("High Magic"));
+        buttonList.add(new JRadioButton("Low Fantasy"));
 		
+		for(JRadioButton button : buttonList) {
+			group.add(button);
+		}
+		
+		for(JRadioButton button : buttonList) {
+			optionsContainer.add(button);
+		}
+		
+		optionsContainer.revalidate();
+		optionsContainer.repaint();
 end
