@@ -32,7 +32,7 @@ public class Rpg {
         	KieRuntimeLogger kLogger = ks.getLoggers().newFileLogger(kSession, "test");
 
             
-            RpgUI ui = new RpgUI(new StartCallback(kSession));
+            RpgUI ui = new RpgUI(new StartCallback(kSession), new AcceptCallback(kSession));
             ui.createAndShowGUI();
         } catch (Throwable t) {
             t.printStackTrace();
@@ -43,11 +43,13 @@ public class Rpg {
 		private JTextArea output;
 		private JPanel optionsContainer;
 		private StartCallback startCallback;
+		private AcceptCallback acceptCallback;
 		
-		public RpgUI(StartCallback startCallback) {
+		public RpgUI(StartCallback startCallback, AcceptCallback acceptCallback) {
 			super(new BorderLayout());
 			
 			this.startCallback = startCallback;
+			this.acceptCallback = acceptCallback;
 			
             JSplitPane splitPane = new JSplitPane( JSplitPane.VERTICAL_SPLIT );
             add( splitPane,
@@ -138,7 +140,7 @@ public class Rpg {
 		
 		private class AcceptButtonHandler extends MouseAdapter {
 			public void mouseReleased(MouseEvent e) {
-				
+				acceptCallback.accept();
 			}
 		}
 	}
@@ -168,6 +170,23 @@ public class Rpg {
             kSession.fireAllRules();
         }
     }
+	
+	public static class AcceptCallback {
+		KieSession kSession;
+		
+		public AcceptCallback(KieSession kSession) {
+			this.kSession = kSession;
+		}
+		
+		public void accept() {
+//			kSession.insert(new Product());
+//			kSession.fireAllRules();
+		}
+	}
+	
+	public static class Product {
+		
+	}
 
 }
 
