@@ -4,6 +4,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JRadioButton;
 import java.util.ArrayList;
 import java.util.List;
+import com.rpg.Rpg.Product;
 
 global javax.swing.JFrame frame
 global javax.swing.JTextArea textArea;
@@ -51,4 +52,11 @@ rule "start"
 		
 		optionsContainer.revalidate();
 		optionsContainer.repaint();
+end
+
+rule "test"
+	when
+		q : Product()
+	then
+		System.out.println("xd");
 end
