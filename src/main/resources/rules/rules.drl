@@ -1,0 +1,8 @@
+package rules
+
+
+rule "Init"
+    when
+    then
+		
+end
