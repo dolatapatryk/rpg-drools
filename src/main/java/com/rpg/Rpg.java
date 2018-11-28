@@ -11,15 +11,11 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTable;
 import javax.swing.JTextArea;
-import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.table.TableColumnModel;
 
 import org.kie.api.KieServices;
 import org.kie.api.logger.KieRuntimeLogger;
@@ -45,6 +41,7 @@ public class Rpg {
 	
 	public static class RpgUI extends JPanel {
 		private JTextArea output;
+		private JPanel optionsContainer;
 		private StartCallback startCallback;
 		
 		public RpgUI(StartCallback startCallback) {
@@ -58,12 +55,8 @@ public class Rpg {
 
             //create top half of split panel and add to parent
             JPanel topHalf = new JPanel();
-            topHalf.setLayout( new BoxLayout( topHalf,
-                                              BoxLayout.X_AXIS ) );
-            topHalf.setBorder( BorderFactory.createEmptyBorder( 5,
-                                                                5,
-                                                                0,
-                                                                5 ) );
+            topHalf.setLayout( new BoxLayout( topHalf, BoxLayout.X_AXIS ) );
+            topHalf.setBorder( BorderFactory.createEmptyBorder( 5,5,0, 5 ) );
             topHalf.setMinimumSize( new Dimension( 400,
                                                    50 ) );
             topHalf.setPreferredSize( new Dimension( 450,
@@ -79,12 +72,11 @@ public class Rpg {
             splitPane.add( bottomHalf );
 
             //Container that list container that shows available store items
-            JPanel listContainer = new JPanel( new GridLayout( 1,
-                                                               1 ) );
-            listContainer.setBorder( BorderFactory.createTitledBorder( "Options" ) );
-            topHalf.add( listContainer );
+            optionsContainer = new JPanel( new GridLayout( 0, 1 ) );
+            optionsContainer.setBorder( BorderFactory.createTitledBorder( "Options" ) );
+            topHalf.add( optionsContainer );
 
-
+           
             JPanel tableContainer = new JPanel( new GridLayout( 1,
                                                                 1 ) );
             tableContainer.setBorder( BorderFactory.createTitledBorder( "Table" ) );
@@ -92,31 +84,27 @@ public class Rpg {
 
 
             //Create panel for checkout button and add to bottomHalf parent
-            JPanel checkoutPane = new JPanel();
+            JPanel buttonPane = new JPanel();
             JButton button = new JButton( "Start" );
             button.setVerticalTextPosition( AbstractButton.CENTER );
             button.setHorizontalTextPosition( AbstractButton.LEADING );
             //attach handler to assert items into working memory
             button.addMouseListener( new StartButtonHandler() );
             button.setActionCommand( "checkout" );
-            checkoutPane.add( button );
-            bottomHalf.add( checkoutPane,
-                            BorderLayout.NORTH );
+            buttonPane.add( button );
+            bottomHalf.add( buttonPane, BorderLayout.NORTH );
 
-            button = new JButton( "Reset" );
+            button = new JButton( "Accept" );
             button.setVerticalTextPosition( AbstractButton.CENTER );
             button.setHorizontalTextPosition( AbstractButton.TRAILING );
             //attach handler to assert items into working memory
-            button.setActionCommand( "reset" );
-            checkoutPane.add( button );
-            bottomHalf.add( checkoutPane,
-                            BorderLayout.NORTH );
+            button.addMouseListener(new AcceptButtonHandler());
+            button.setActionCommand( "accept" );
+            buttonPane.add( button );
+            bottomHalf.add( buttonPane, BorderLayout.NORTH );
 
-            //Create output area, imbed in scroll area an add to bottomHalf parent
-            //Scope is at instance level so it can be easily referenced from other
-            // methods
-            output = new JTextArea( 1,
-                                    10 );
+
+            output = new JTextArea( 1, 10 );
             output.setEditable( false );
             JScrollPane outputPane = new JScrollPane( output,
                                                       ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
@@ -127,6 +115,7 @@ public class Rpg {
             output.append("tam gdzie jest \"List\" mozna chyba wyswietlac dostepne opcje do pytania\n");
             
             this.startCallback.setTextArea(output);
+            this.startCallback.setOptionsContainer(optionsContainer);
 		}
 		
 		public void createAndShowGUI() {
@@ -146,11 +135,18 @@ public class Rpg {
 				startCallback.checkout((JFrame) button.getTopLevelAncestor());
 			}
 		}
+		
+		private class AcceptButtonHandler extends MouseAdapter {
+			public void mouseReleased(MouseEvent e) {
+				
+			}
+		}
 	}
 	
 	public static class StartCallback {
 		KieSession kSession;
         JTextArea textArea;
+        JPanel optionsContainer;
 
         public StartCallback(KieSession kSession) {
             this.kSession = kSession;
@@ -159,13 +155,15 @@ public class Rpg {
         public void setTextArea(JTextArea textArea) {
             this.textArea = textArea;
         }
+        
+        public void setOptionsContainer(JPanel optionsContainer) {
+        	this.optionsContainer = optionsContainer;
+        }
 
         
         public void checkout(JFrame frame) {
-
-
-            //add the JFrame to the ApplicationData to allow for user interaction
         	kSession.setGlobal("frame", frame);
+        	kSession.setGlobal("optionsContainer", this.optionsContainer);
         	kSession.setGlobal("textArea", this.textArea);
             kSession.fireAllRules();
         }
