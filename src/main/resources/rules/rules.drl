@@ -1,8 +1,29 @@
 package rules
 
+global javax.swing.JFrame frame
+global javax.swing.JTextArea textArea;
+
+declare Question
+	text : String
+	selectionMode : int
+	answer : String
+end
+
 
 rule "Init"
     when
     then
-		
+    	Question q = new Question();
+    	q.setText("Which subgenre?");
+    	q.setSelectionMode(1);
+    	q.setAnswer("");
+        insert(q);
+
+end
+
+rule "start"
+    when
+        q : Question(q.getText().equals("Which subgenre?") && q.getAnswer().equals(""));
+    then
+        textArea.append(q.getText() + "\n");
 end
