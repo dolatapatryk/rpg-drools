@@ -1,6 +1,7 @@
 package com.rpg;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
@@ -12,6 +13,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
@@ -118,6 +120,7 @@ public class Rpg {
             
             this.startCallback.setTextArea(output);
             this.startCallback.setOptionsContainer(optionsContainer);
+            this.acceptCallback.setOptionsContainer(optionsContainer);
 		}
 		
 		public void createAndShowGUI() {
@@ -173,14 +176,23 @@ public class Rpg {
 	
 	public static class AcceptCallback {
 		KieSession kSession;
+		JPanel optionsContainer;
 		
 		public AcceptCallback(KieSession kSession) {
 			this.kSession = kSession;
 		}
 		
+		public void setOptionsContainer(JPanel optionsContainer) {
+			this.optionsContainer = optionsContainer;
+		}
+		
 		public void accept() {
-//			kSession.insert(new Product());
-//			kSession.fireAllRules();
+			for(Component c : optionsContainer.getComponents()) {
+				if(c instanceof JRadioButton && ((JRadioButton) c).isSelected()) {
+					System.out.println(((JRadioButton) c).getText());
+					break;
+				}
+			}
 		}
 	}
 	
