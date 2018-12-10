@@ -1,62 +1,518 @@
 package rules
 
-import javax.swing.ButtonGroup;
-import javax.swing.JRadioButton;
-import java.util.ArrayList;
-import java.util.List;
-import com.rpg.Rpg.Product;
+import javax.swing.*;
+import org.kie.api.runtime.*;
+global JFrame window;
 
-global javax.swing.JFrame frame
-global javax.swing.JTextArea textArea;
-global javax.swing.JPanel optionsContainer;
-
-declare Question
-	text : String
-	selectionMode : int
-	answer : String
+declare enum Question
+	WHICH_SUBGENRE("Which subgenre?", new String[]{"Humor", "Oriental", "High Fantasy General", "High Magic", "Low Fantasy" }),
+	WITH_META_PLOTS("With meta-plots and CCG element?", new String[]{"Yes", "No"}),
+	WCLASSES_POINT_BUY("WClasses? Point buy?", new String[]{"Lifepaths", "Just give me D&D options",
+	"Great ideas but spaghetti rules","Point systems","4 custom charts per class","No class. All point buy!"}),
+	WHAT_THINK_GYGAX("What do you think of Gygax?", new String[]{"He's the father of RPG", "He's cool", "Who?"}),
+	MYTH_BASED("Mythodology based?", new String[]{"Yes", "No"}),
+	ARE_YOU_FUNDAMENTAL("Are you fundamentalist about it?", new String[]{"Yes", "No"}),
+	ODD_MECHANIC("Do you like odd mechanic?", new String[]{"More subsytem please", "No"}),
+	RACES_AS_CLASSES("Do you like odd mechanic?", new String[]{"Why can't my drive be a cleric?", "Yes", "Only 2 classes are needed", 
+	"Archetypes instead", "No but I want skills"}),
+	SKILLS_WITH_THAT("Want skills with that?", new String[]{"No", "Yes"}),
+	GYGAX_HIMSELF("Designed by Gygax himself?", new String[]{"No", "Yes", "Yes & Drop Classes too"}),
+	SPLATBOOKS_GALONE("Want splatbooks galone?", new String[]{"Not really", "Yes", "Make it simple"}),
+	POST_UPDATES("Want post 2007 updates?", new String[]{"Yes", "No"}),
+	HOW_SIMPLE("How simple?", new String[]{"Very", "Sorta"}),
+	CRPG_MMORPG("Do you want game based on CPORG or MMORPG?", new String[]{"MMORPG", "CRPG"}),
+	SEMI_HISTORICAL("Semi historical or post-apocaliptic setting?", new String[]{"Neither", "Semi-historical","Post appoc"}),
+	HYBRYDIZE_DD("Hybridize it moneso with D&D?", new String[]{"No"}),
+	MIDDLE_OR_RNSC("Based on middle Ages or Renaissance?", new String[]{"Middle Ages", "Renaissance"}),
+	CAREER_PATH("What do you think about career path advancment?", new String[]{"Good idea", "Not really"}),
+	DICE_POOLS("Dice Pools?", new String[]{"Yes", "no"}),
+	OLD_NEW_SCHOOL("Old or new school?", new String[]{"Old", "New"}),
+	SLEW_OF_SKILLS("Still want a slew of skills?", new String[]{"Use astrology instead", "Not really", "And > 15 abilities"}),
+	DYNASTY_HERALDY("Medival dynasty or heraldy rules?", new String[]{"Heraldy", "Dynasty", "Neither"});
+	
+    text : String
+    options : String[]
 end
 
 
-rule "Init"
-    when
-    then
-    	Question q = new Question();
-    	q.setText("Which subgenre?");
-    	q.setSelectionMode(1);
-    	q.setAnswer("");
-        insert(q);
-
+declare Answer
+    question : Question @key
+    choice : String
 end
 
-rule "start"
-    when
-        q : Question(q.getText().equals("Which subgenre?") && q.getAnswer().equals(""));
-    then
-        textArea.append(q.getText() + "\n");
-        List<JRadioButton> buttonList = new ArrayList<>();
-        ButtonGroup group = new ButtonGroup();
-        
-        buttonList.add(new JRadioButton("Humor"));
-        buttonList.add(new JRadioButton("Oriental"));
-        buttonList.add(new JRadioButton("High Fantasy General"));
-        buttonList.add(new JRadioButton("High Magic"));
-        buttonList.add(new JRadioButton("Low Fantasy"));
-		
-		for(JRadioButton button : buttonList) {
-			group.add(button);
-		}
-		
-		for(JRadioButton button : buttonList) {
-			optionsContainer.add(button);
-		}
-		
-		optionsContainer.revalidate();
-		optionsContainer.repaint();
+
+function void ask(JFrame window, KieRuntime krt, Question question) {
+    String[] options = question.getOptions();
+    int answerVal = JOptionPane.showOptionDialog(window, question.getText(), "", JOptionPane.YES_NO_CANCEL_OPTION,
+            JOptionPane.QUESTION_MESSAGE, null, options, 1);
+    Answer answer = new Answer(question);
+    answer.setChoice(options[answerVal]);
+    krt.insert(answer);
+}
+
+function void showResult(JFrame window, String movieName) {
+    JOptionPane.showMessageDialog(window, movieName);
+}
+
+rule "init"
+then
+    ask(window, kcontext.getKieRuntime(), Question.WHICH_SUBGENRE);
 end
 
-rule "test"
-	when
-		q : Product()
-	then
-		System.out.println("xd");
+rule "which genre - Humor"
+when
+    Answer(question == Question.WHICH_SUBGENRE, choice == Question.WHICH_SUBGENRE.getOptions()[0])
+then
+   showResult(window, "Hackmaster");
 end
+// end branch
+
+rule "which genre - Oriental"
+when
+    Answer(question == Question.WHICH_SUBGENRE, choice == Question.WHICH_SUBGENRE.getOptions()[1])
+then
+   ask(window, kcontext.getKieRuntime(), Question.WITH_META_PLOTS);
+end
+
+rule "With meta-plots and CCG element - yes"
+when
+    Answer(question == Question.WITH_META_PLOTS, choice == Question.WITH_META_PLOTS.getOptions()[0])
+then
+   showResult(window, "Legend of the 5 Rings");
+end
+// end branch
+
+rule "With meta-plots and CCG element - no"
+when
+    Answer(question == Question.WITH_META_PLOTS, choice == Question.WITH_META_PLOTS.getOptions()[1])
+then
+   showResult(window, "Oriental Adventures");
+end
+// end branch
+
+rule "which genre - High Fantasy General"
+when
+    Answer(question == Question.WHICH_SUBGENRE, choice == Question.WHICH_SUBGENRE.getOptions()[2])
+then
+   ask(window, kcontext.getKieRuntime(), Question.WCLASSES_POINT_BUY);
+end
+
+rule "WClasses? Point buy? - Lifepaths"
+when
+    Answer(question == Question.WCLASSES_POINT_BUY, choice == Question.WCLASSES_POINT_BUY.getOptions()[0])
+then
+   showResult(window, "Burning Wheel");
+end
+// end branch
+
+rule "WClasses? Point buy? - Just give me D&D options"
+when
+    Answer(question == Question.WCLASSES_POINT_BUY, choice == Question.WCLASSES_POINT_BUY.getOptions()[1])
+then
+   ask(window, kcontext.getKieRuntime(), Question.WHAT_THINK_GYGAX);
+end
+
+rule "What do you think of Gygax? - He's the father of RPG"
+when
+    Answer(question == Question.WHAT_THINK_GYGAX, choice == Question.WHAT_THINK_GYGAX.getOptions()[0])
+then
+   ask(window, kcontext.getKieRuntime(), Question.ARE_YOU_FUNDAMENTAL);
+end
+
+rule "Are you fundamentalist about it? - Yes"
+when
+    Answer(question == Question.ARE_YOU_FUNDAMENTAL, choice == Question.ARE_YOU_FUNDAMENTAL.getOptions()[0])
+then
+   showResult(window, "D&D 0E");
+end
+// end branch
+
+rule "Are you fundamentalist about it? - No"
+when
+    Answer(question == Question.ARE_YOU_FUNDAMENTAL, choice == Question.ARE_YOU_FUNDAMENTAL.getOptions()[1])
+then
+   ask(window, kcontext.getKieRuntime(), Question.RACES_AS_CLASSES);
+end
+
+rule "Do you like races or classes? - Why can't my dwarf be a cleric"
+when
+    Answer(question == Question.RACES_AS_CLASSES, choice == Question.RACES_AS_CLASSES.getOptions()[0])
+then
+   showResult(window, "D&D 3E");
+end
+// end branch
+
+rule "Do you like races or classes? - Yes"
+when
+    Answer(question == Question.RACES_AS_CLASSES, choice == Question.RACES_AS_CLASSES.getOptions()[1])
+then
+   showResult(window, "BECMI");
+end
+// end branch
+
+rule "Do you like races or classes? - Only 2 classes are needed"
+when
+    Answer(question == Question.RACES_AS_CLASSES, choice == Question.RACES_AS_CLASSES.getOptions()[2])
+then
+   ask(window, kcontext.getKieRuntime(), Question.SKILLS_WITH_THAT);
+end
+
+rule "Want skills with that? - No"
+when
+    Answer(question == Question.SKILLS_WITH_THAT, choice == Question.SKILLS_WITH_THAT.getOptions()[0])
+then
+   showResult(window, "Tunels & Trolls early edition");
+end
+// end branch
+
+rule "Want skills with that? - Yes"
+when
+    Answer(question == Question.SKILLS_WITH_THAT, choice == Question.SKILLS_WITH_THAT.getOptions()[1])
+then
+   showResult(window, "Tunels & Trolls 7th edition");
+end
+// end branch
+
+rule "Do you like races or classes? - Archetypes instead"
+when
+    Answer(question == Question.RACES_AS_CLASSES, choice == Question.RACES_AS_CLASSES.getOptions()[3])
+then
+   showResult(window, "Talislanta");
+end
+// end branch
+
+rule "Do you like races or classes? - No but I want skills"
+when
+    Answer(question == Question.RACES_AS_CLASSES, choice == Question.RACES_AS_CLASSES.getOptions()[4])
+then
+   ask(window, kcontext.getKieRuntime(), Question.GYGAX_HIMSELF);
+end
+
+rule "Designed by Gygax himself? - No"
+when
+    Answer(question == Question.GYGAX_HIMSELF, choice == Question.GYGAX_HIMSELF.getOptions()[0])
+then
+   showResult(window, "Hackmaster Basaic");
+end
+// end branch
+
+rule "Designed by Gygax himself? - Yes"
+when
+    Answer(question == Question.GYGAX_HIMSELF, choice == Question.GYGAX_HIMSELF.getOptions()[1])
+then
+   showResult(window, "Dangerous Journeys");
+end
+// end branch
+
+rule "Designed by Gygax himself? - Yes and Drop classes too"
+when
+    Answer(question == Question.GYGAX_HIMSELF, choice == Question.GYGAX_HIMSELF.getOptions()[2])
+then
+   showResult(window, "Legendary Adventure");
+end
+// end branch
+
+rule "What do you think of Gygax? - He's cool"
+when
+    Answer(question == Question.WHAT_THINK_GYGAX, choice == Question.WHAT_THINK_GYGAX.getOptions()[1])
+then
+   ask(window, kcontext.getKieRuntime(), Question.ODD_MECHANIC);
+end
+
+rule "Do you like odd mechanics? - More subsystem please"
+when
+    Answer(question == Question.ODD_MECHANIC, choice == Question.ODD_MECHANIC.getOptions()[0])
+then
+   showResult(window, "D&D 2E");
+end
+// end branch
+
+rule "Do you like odd mechanics? - No"
+when
+    Answer(question == Question.ODD_MECHANIC, choice == Question.ODD_MECHANIC.getOptions()[1])
+then
+   ask(window, kcontext.getKieRuntime(), Question.SPLATBOOKS_GALONE);
+end
+
+rule "Want splatbooks galone - Not really"
+when
+    Answer(question == Question.SPLATBOOKS_GALONE, choice == Question.SPLATBOOKS_GALONE.getOptions()[0])
+then
+   showResult(window, "Castles and Crusades");
+end
+// end branch
+
+rule "Want splatbooks galone - Yes"
+when
+    Answer(question == Question.SPLATBOOKS_GALONE, choice == Question.SPLATBOOKS_GALONE.getOptions()[1])
+then
+   ask(window, kcontext.getKieRuntime(), Question.POST_UPDATES);
+end
+
+rule "Want post 2007 updates - No"
+when
+    Answer(question == Question.POST_UPDATES, choice == Question.POST_UPDATES.getOptions()[0])
+then
+   showResult(window, "D&D 3E/3.5");
+end
+// end branch
+
+rule "Want post 2007 updates - Yes"
+when
+    Answer(question == Question.POST_UPDATES, choice == Question.POST_UPDATES.getOptions()[1])
+then
+   showResult(window, "Pathfinder");
+end
+// end branch
+
+rule "Want splatbooks galone - Make it simple"
+when
+    Answer(question == Question.SPLATBOOKS_GALONE, choice == Question.SPLATBOOKS_GALONE.getOptions()[2])
+then
+   ask(window, kcontext.getKieRuntime(), Question.HOW_SIMPLE);
+end
+
+rule "How simple? - Very"
+when
+    Answer(question == Question.HOW_SIMPLE, choice == Question.HOW_SIMPLE.getOptions()[0])
+then
+   showResult(window, "True20");
+end
+// end branch
+
+rule "How simple? - Sorta"
+when
+    Answer(question == Question.HOW_SIMPLE, choice == Question.HOW_SIMPLE.getOptions()[1])
+then
+   showResult(window, "Fantasy Craft");
+end
+// end branch
+
+
+rule "What do you think of Gygax? - Who?"
+when
+    Answer(question == Question.WHAT_THINK_GYGAX, choice == Question.WHAT_THINK_GYGAX.getOptions()[2])
+then
+   ask(window, kcontext.getKieRuntime(), Question.CRPG_MMORPG);
+end
+
+rule "Do you want MMORPG or CRPG? - MMORPG?"
+when
+    Answer(question == Question.CRPG_MMORPG, choice == Question.CRPG_MMORPG.getOptions()[0])
+then
+   showResult(window, "D&D 4E");
+end
+// end branch
+
+rule "Do you want MMORPG or CRPG? - CRPG?"
+when
+    Answer(question == Question.CRPG_MMORPG, choice == Question.CRPG_MMORPG.getOptions()[1])
+then
+   showResult(window, "Dragon Age");
+end
+// end branch
+
+rule "WClasses? Point buy? - Great ideas but spaghetti rules"
+when
+    Answer(question == Question.WCLASSES_POINT_BUY, choice == Question.WCLASSES_POINT_BUY.getOptions()[2])
+then
+   showResult(window, "Palladium Fantasy");
+end
+// end branch
+
+rule "WClasses? Point buy? - Point systems"
+when
+    Answer(question == Question.WCLASSES_POINT_BUY, choice == Question.WCLASSES_POINT_BUY.getOptions()[3])
+then
+   ask(window, kcontext.getKieRuntime(), Question.MYTH_BASED);
+end
+
+rule "Mythodology based - Yes"
+when
+    Answer(question == Question.MYTH_BASED, choice == Question.MYTH_BASED.getOptions()[0])
+then
+   showResult(window, "Exalted");
+end
+// end branch
+
+rule "Mythodology based - No"
+when
+    Answer(question == Question.MYTH_BASED, choice == Question.MYTH_BASED.getOptions()[1])
+then
+   showResult(window, "Fantasy Hero");
+end
+// end branch
+
+rule "WClasses? Point buy? - 4 custom charts per class"
+when
+    Answer(question == Question.WCLASSES_POINT_BUY, choice == Question.WCLASSES_POINT_BUY.getOptions()[4])
+then
+   showResult(window, "Rolemaster");
+end
+// end branch
+
+rule "WClasses? Point buy? - No class. All point buy!"
+when
+    Answer(question == Question.WCLASSES_POINT_BUY, choice == Question.WCLASSES_POINT_BUY.getOptions()[5])
+then
+   showResult(window, "Fantasy HERO");
+end
+// end branch
+
+rule "which genre - High Magic"
+when
+    Answer(question == Question.WHICH_SUBGENRE, choice == Question.WHICH_SUBGENRE.getOptions()[3])
+then
+   ask(window, kcontext.getKieRuntime(), Question.SEMI_HISTORICAL);
+end
+
+rule "Semi historical or post-apoc - Neither"
+when
+    Answer(question == Question.SEMI_HISTORICAL, choice == Question.SEMI_HISTORICAL.getOptions()[0])
+then
+   ask(window, kcontext.getKieRuntime(), Question.HYBRYDIZE_DD);
+end
+
+rule "Hybrydize DD - No"
+when
+    Answer(question == Question.HYBRYDIZE_DD, choice == Question.HYBRYDIZE_DD.getOptions()[0])
+then
+   showResult(window, "RuneQuest");
+end
+// end branch
+
+rule "Semi historical or post-apoc - semi-historical"
+when
+    Answer(question == Question.SEMI_HISTORICAL, choice == Question.SEMI_HISTORICAL.getOptions()[1])
+then
+   ask(window, kcontext.getKieRuntime(), Question.MIDDLE_OR_RNSC);
+end
+
+rule "Based on middle ages or renaissance - middle-ages"
+when
+    Answer(question == Question.MIDDLE_OR_RNSC, choice == Question.MIDDLE_OR_RNSC.getOptions()[0])
+then
+   showResult(window, "Ars Magica");
+end
+// end branch
+
+rule "Based on middle ages or renaissance - ren"
+when
+    Answer(question == Question.MIDDLE_OR_RNSC, choice == Question.MIDDLE_OR_RNSC.getOptions()[1])
+then
+   showResult(window, "7th Sea");
+end
+// end branch
+
+rule "Semi historical or post-apoc - post-apoc"
+when
+    Answer(question == Question.SEMI_HISTORICAL, choice == Question.SEMI_HISTORICAL.getOptions()[2])
+then
+   showResult(window, "EarthDown");
+end
+// end branch
+
+rule "which genre - Low Fantasy"
+when
+    Answer(question == Question.WHICH_SUBGENRE, choice == Question.WHICH_SUBGENRE.getOptions()[4])
+then
+   ask(window, kcontext.getKieRuntime(), Question.CAREER_PATH);
+end
+
+rule "Watta think of career path advanced - Good idea"
+when
+    Answer(question == Question.CAREER_PATH, choice == Question.CAREER_PATH.getOptions()[0])
+then
+   ask(window, kcontext.getKieRuntime(), Question.DICE_POOLS);
+end
+
+rule "Dice pools - yes"
+when
+    Answer(question == Question.DICE_POOLS, choice == Question.DICE_POOLS.getOptions()[0])
+then
+   showResult(window, "Warhammer RP 2e");
+end
+// end branch
+
+rule "Dice pools - no"
+when
+    Answer(question == Question.DICE_POOLS, choice == Question.DICE_POOLS.getOptions()[1])
+then
+   showResult(window, "Warhammer RP 3e");
+end
+// end branch
+
+rule "Watta think of career path advanced - Not really"
+when
+    Answer(question == Question.CAREER_PATH, choice == Question.CAREER_PATH.getOptions()[1])
+then
+   ask(window, kcontext.getKieRuntime(), Question.OLD_NEW_SCHOOL);
+end
+
+rule "Old or new school - Old"
+when
+    Answer(question == Question.OLD_NEW_SCHOOL, choice == Question.OLD_NEW_SCHOOL.getOptions()[0])
+then
+   ask(window, kcontext.getKieRuntime(), Question.SLEW_OF_SKILLS);
+end
+
+rule "Still want a slew of skills - astrology"
+when
+    Answer(question == Question.SLEW_OF_SKILLS, choice == Question.SLEW_OF_SKILLS.getOptions()[0])
+then
+   showResult(window, "Chivarly & Sorcery");
+end
+// end branch
+
+rule "Still want a slew of skills - not really"
+when
+    Answer(question == Question.SLEW_OF_SKILLS, choice == Question.SLEW_OF_SKILLS.getOptions()[1])
+then
+   ask(window, kcontext.getKieRuntime(), Question.DYNASTY_HERALDY);
+end
+
+rule "Dynasty or heraldy rules - heraldy"
+when
+    Answer(question == Question.DYNASTY_HERALDY, choice == Question.DYNASTY_HERALDY.getOptions()[0])
+then
+   showResult(window, "Song of Ice and Fire Roleplaying");
+end
+// end branch
+
+
+rule "Dynasty or heraldy rules - dynasty"
+when
+    Answer(question == Question.DYNASTY_HERALDY, choice == Question.DYNASTY_HERALDY.getOptions()[1])
+then
+   showResult(window, "PENDRAGON!");
+end
+// end branch
+
+
+rule "Dynasty or heraldy rules - neither"
+when
+    Answer(question == Question.DYNASTY_HERALDY, choice == Question.DYNASTY_HERALDY.getOptions()[2])
+then
+   showResult(window, "Conan (TSR)");
+end
+// end branch
+
+
+rule "Still want a slew of skills - 15 abilities"
+when
+    Answer(question == Question.SLEW_OF_SKILLS, choice == Question.SLEW_OF_SKILLS.getOptions()[2])
+then
+   showResult(window, "Hammaster");
+end
+// end branch
+
+rule "Old or new school - New"
+when
+    Answer(question == Question.OLD_NEW_SCHOOL, choice == Question.OLD_NEW_SCHOOL.getOptions()[1])
+then
+   showResult(window, "Conan (Mongoose)");
+end
+// end branch
+
+
+
