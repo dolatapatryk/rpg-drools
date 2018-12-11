@@ -1,8 +1,11 @@
 package rules
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.*;
 import org.kie.api.runtime.*;
 global JFrame window;
+
 
 declare enum Question
 	WHICH_SUBGENRE("Which subgenre?", new String[]{"Humor", "Oriental", "High Fantasy General", "High Magic", "Low Fantasy" }),
@@ -50,8 +53,9 @@ function void ask(JFrame window, KieRuntime krt, Question question) {
     krt.insert(answer);
 }
 
+
 function void showResult(JFrame window, String movieName) {
-    JOptionPane.showMessageDialog(window, movieName);
+    JOptionPane.showMessageDialog(window, "Congratulations! Your choice is: \n" + movieName);
 }
 
 rule "init"
@@ -65,7 +69,6 @@ when
 then
    showResult(window, "Hackmaster");
 end
-// end branch
 
 rule "which genre - Oriental"
 when
@@ -80,7 +83,6 @@ when
 then
    showResult(window, "Legend of the 5 Rings");
 end
-// end branch
 
 rule "With meta-plots and CCG element - no"
 when
@@ -88,7 +90,6 @@ when
 then
    showResult(window, "Oriental Adventures");
 end
-// end branch
 
 rule "which genre - High Fantasy General"
 when
@@ -103,7 +104,6 @@ when
 then
    showResult(window, "Burning Wheel");
 end
-// end branch
 
 rule "WClasses? Point buy? - Just give me D&D options"
 when
@@ -125,7 +125,6 @@ when
 then
    showResult(window, "D&D 0E");
 end
-// end branch
 
 rule "Are you fundamentalist about it? - No"
 when
@@ -140,7 +139,6 @@ when
 then
    showResult(window, "D&D 3E");
 end
-// end branch
 
 rule "Do you like races or classes? - Yes"
 when
@@ -148,7 +146,6 @@ when
 then
    showResult(window, "BECMI");
 end
-// end branch
 
 rule "Do you like races or classes? - Only 2 classes are needed"
 when
@@ -163,7 +160,6 @@ when
 then
    showResult(window, "Tunels & Trolls early edition");
 end
-// end branch
 
 rule "Want skills with that? - Yes"
 when
@@ -171,7 +167,6 @@ when
 then
    showResult(window, "Tunels & Trolls 7th edition");
 end
-// end branch
 
 rule "Do you like races or classes? - Archetypes instead"
 when
@@ -179,7 +174,6 @@ when
 then
    showResult(window, "Talislanta");
 end
-// end branch
 
 rule "Do you like races or classes? - No but I want skills"
 when
@@ -194,7 +188,6 @@ when
 then
    showResult(window, "Hackmaster Basaic");
 end
-// end branch
 
 rule "Designed by Gygax himself? - Yes"
 when
@@ -202,7 +195,6 @@ when
 then
    showResult(window, "Dangerous Journeys");
 end
-// end branch
 
 rule "Designed by Gygax himself? - Yes and Drop classes too"
 when
@@ -210,7 +202,6 @@ when
 then
    showResult(window, "Legendary Adventure");
 end
-// end branch
 
 rule "What do you think of Gygax? - He's cool"
 when
@@ -225,7 +216,6 @@ when
 then
    showResult(window, "D&D 2E");
 end
-// end branch
 
 rule "Do you like odd mechanics? - No"
 when
@@ -240,7 +230,6 @@ when
 then
    showResult(window, "Castles and Crusades");
 end
-// end branch
 
 rule "Want splatbooks galone - Yes"
 when
@@ -255,7 +244,6 @@ when
 then
    showResult(window, "D&D 3E/3.5");
 end
-// end branch
 
 rule "Want post 2007 updates - Yes"
 when
@@ -263,7 +251,6 @@ when
 then
    showResult(window, "Pathfinder");
 end
-// end branch
 
 rule "Want splatbooks galone - Make it simple"
 when
@@ -278,7 +265,6 @@ when
 then
    showResult(window, "True20");
 end
-// end branch
 
 rule "How simple? - Sorta"
 when
@@ -286,7 +272,6 @@ when
 then
    showResult(window, "Fantasy Craft");
 end
-// end branch
 
 
 rule "What do you think of Gygax? - Who?"
@@ -302,7 +287,6 @@ when
 then
    showResult(window, "D&D 4E");
 end
-// end branch
 
 rule "Do you want MMORPG or CRPG? - CRPG?"
 when
@@ -310,7 +294,6 @@ when
 then
    showResult(window, "Dragon Age");
 end
-// end branch
 
 rule "WClasses? Point buy? - Great ideas but spaghetti rules"
 when
@@ -318,7 +301,6 @@ when
 then
    showResult(window, "Palladium Fantasy");
 end
-// end branch
 
 rule "WClasses? Point buy? - Point systems"
 when
@@ -333,7 +315,6 @@ when
 then
    showResult(window, "Exalted");
 end
-// end branch
 
 rule "Mythodology based - No"
 when
@@ -341,7 +322,6 @@ when
 then
    showResult(window, "Fantasy Hero");
 end
-// end branch
 
 rule "WClasses? Point buy? - 4 custom charts per class"
 when
@@ -349,7 +329,6 @@ when
 then
    showResult(window, "Rolemaster");
 end
-// end branch
 
 rule "WClasses? Point buy? - No class. All point buy!"
 when
@@ -357,7 +336,6 @@ when
 then
    showResult(window, "Fantasy HERO");
 end
-// end branch
 
 rule "which genre - High Magic"
 when
@@ -379,7 +357,6 @@ when
 then
    showResult(window, "RuneQuest");
 end
-// end branch
 
 rule "Semi historical or post-apoc - semi-historical"
 when
@@ -394,7 +371,6 @@ when
 then
    showResult(window, "Ars Magica");
 end
-// end branch
 
 rule "Based on middle ages or renaissance - ren"
 when
@@ -402,7 +378,6 @@ when
 then
    showResult(window, "7th Sea");
 end
-// end branch
 
 rule "Semi historical or post-apoc - post-apoc"
 when
@@ -410,7 +385,6 @@ when
 then
    showResult(window, "EarthDown");
 end
-// end branch
 
 rule "which genre - Low Fantasy"
 when
@@ -432,7 +406,6 @@ when
 then
    showResult(window, "Warhammer RP 2e");
 end
-// end branch
 
 rule "Dice pools - no"
 when
@@ -440,7 +413,6 @@ when
 then
    showResult(window, "Warhammer RP 3e");
 end
-// end branch
 
 rule "Watta think of career path advanced - Not really"
 when
@@ -462,7 +434,6 @@ when
 then
    showResult(window, "Chivarly & Sorcery");
 end
-// end branch
 
 rule "Still want a slew of skills - not really"
 when
@@ -477,7 +448,6 @@ when
 then
    showResult(window, "Song of Ice and Fire Roleplaying");
 end
-// end branch
 
 
 rule "Dynasty or heraldy rules - dynasty"
@@ -486,7 +456,6 @@ when
 then
    showResult(window, "PENDRAGON!");
 end
-// end branch
 
 
 rule "Dynasty or heraldy rules - neither"
@@ -495,7 +464,6 @@ when
 then
    showResult(window, "Conan (TSR)");
 end
-// end branch
 
 
 rule "Still want a slew of skills - 15 abilities"
@@ -504,7 +472,6 @@ when
 then
    showResult(window, "Hammaster");
 end
-// end branch
 
 rule "Old or new school - New"
 when
@@ -512,7 +479,3 @@ when
 then
    showResult(window, "Conan (Mongoose)");
 end
-// end branch
-
-
-
